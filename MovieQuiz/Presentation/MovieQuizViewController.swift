@@ -114,13 +114,9 @@ final class MovieQuizViewController: UIViewController {
     }
     
     // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
-    private func switchButtons(button: UIButton) {
-        switch button.isEnabled {
-        case true:
-            button.isEnabled = false
-        case false:
-            button.isEnabled = true
-        }
+    private func switchButtons() {
+        yesButton.isEnabled.toggle()
+        noButton.isEnabled.toggle()
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -132,13 +128,11 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        switchButtons(button: yesButton)
-        switchButtons(button: noButton)
+        switchButtons()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResults()
-            self.switchButtons(button: self.yesButton)
-            self.switchButtons(button: self.noButton)
+            self.switchButtons()
             }
     }
     
@@ -177,7 +171,7 @@ final class MovieQuizViewController: UIViewController {
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    @IBAction func noButtonClicked(_ sender: UIButton) {
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = false
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
