@@ -16,7 +16,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
-
+    
+    private var alertPresenter: AlertPresenter?
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -31,7 +33,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-
+        
         func alertAction() {
             currentQuestionIndex = 0
             correctAnswers = 0
@@ -39,11 +41,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             questionFactory?.requestNextQuestion()
         }
-        
+
         let alertModel: AlertModel = AlertModel(quizRezult: result, completion: alertAction)
-        let alertPresenter = AlertPresenter(model: alertModel, viewController: self)
+        alertPresenter = AlertPresenter(model: alertModel, viewController: self)
         
-        alertPresenter.showAlert()
+        alertPresenter?.showAlert()
     }
     
     // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
@@ -91,6 +93,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let jsonName: String = "inception.json"
+        var jsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        jsonURL.appendPathComponent(jsonName)
+        let jsonString = try? String(contentsOf: jsonURL)
+        
+        //print(jsonString!)
+    
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
     }
