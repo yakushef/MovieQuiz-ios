@@ -24,6 +24,7 @@
 		BC60770F29BE421000D79BE0 /* QuestionFactoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC60770E29BE421000D79BE0 /* QuestionFactoryDelegate.swift */; };
 		BCB2867229A9038100DF75AE /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCB2867029A902F200DF75AE /* YS Display-Bold.ttf */; };
 		BCB2867329A9038500DF75AE /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCB2867129A902F200DF75AE /* YS Display-Medium.ttf */; };
+		BCB7688329C442C100E2D410 /* IMDBModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB7688229C442C100E2D410 /* IMDBModels.swift */; };
 		BCD1CB7129BEF8E200849E5E /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD1CB7029BEF8E200849E5E /* AlertModel.swift */; };
 		BCD1CB7329BEF9B500849E5E /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD1CB7229BEF9B400849E5E /* AlertPresenter.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 		BC60770E29BE421000D79BE0 /* QuestionFactoryDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactoryDelegate.swift; sourceTree = "<group>"; };
 		BCB2867029A902F200DF75AE /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		BCB2867129A902F200DF75AE /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
+		BCB7688229C442C100E2D410 /* IMDBModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMDBModels.swift; sourceTree = "<group>"; };
 		BCD1CB7029BEF8E200849E5E /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
 		BCD1CB7229BEF9B400849E5E /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,6 +144,7 @@
 				BC1CC49029BB0290005A276D /* QuizResultsViewModel.swift */,
 				BC1CC49229BB02B2005A276D /* QuizQuestion.swift */,
 				BCD1CB7029BEF8E200849E5E /* AlertModel.swift */,
+				BCB7688229C442C100E2D410 /* IMDBModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
+				BCB7688329C442C100E2D410 /* IMDBModels.swift in Sources */,
 				BCD1CB7329BEF9B500849E5E /* AlertPresenter.swift in Sources */,
 				BCD1CB7129BEF8E200849E5E /* AlertModel.swift in Sources */,
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,

@@ -88,6 +88,48 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    private func getMovie(from jsonString: String) -> Movie? {
+        let jsonData = jsonString.data(using: .utf8)!
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
+            
+            guard let json = json,
+                  let id = json["id"] as? String,
+                  let title = json["title"] as? String,
+                  let jsonYear = json["year"] as? String,
+                  let year = Int(jsonYear),
+                  let image = json["image"] as? String,
+                  let releaseDate = json["releaseDate"] as? String,
+                  let jsonRuntimeMins = json["runtimeMins"] as? String,
+                  let runtimeMins = Int(jsonRuntimeMins),
+                  let directors = json["directors"] as? String,
+                  let actorList = json["actorList"] as? [Any] else {
+                return nil
+            }
+            
+            var movieActors: [Actor] = []
+            
+            for actor in actorList {
+                guard let actor = actor as? [String: Any],
+                      let id = actor["id"] as? String,
+                      let image = actor["image"] as? String,
+                      let name = actor["name"] as? String,
+                      let asCharacter = actor["asCharacter"] as? String else {
+                    return nil
+                }
+                let movieActor = Actor(id: id, image: image, name: name, asCharacter: asCharacter)
+                movieActors.append(movieActor)
+            }
+            
+            let movie = Movie(id: id, title: title, year: year, image: image, releaseDate: releaseDate, runtimeMins: runtimeMins, directors: directors, actorList: movieActors)
+            return movie
+            
+        } catch {
+            print("Failed to parse \(jsonString)")
+            return nil
+        }
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -97,8 +139,22 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         var jsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         jsonURL.appendPathComponent(jsonName)
         let jsonString = try? String(contentsOf: jsonURL)
+        //print(getMovie(from: jsonString!))
+        //let jsonData = jsonString!.data(using: .utf8)!
         
-        //print(jsonString!)
+        //поправить распаковку
+        
+       /* do {
+            let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
+            let actorList = json?["actorList"] as! [Any]
+            for actor in actorList {
+                if let actor = actor as? [String: Any] {
+                    print(actor["name"])
+                }
+            }
+        } catch {
+            print("Failed to parse \(jsonString!)")
+        }*/
     
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
