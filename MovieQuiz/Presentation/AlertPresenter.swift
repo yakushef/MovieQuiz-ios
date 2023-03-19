@@ -11,32 +11,31 @@ import UIKit
 
 class AlertPresenter {
     let model: AlertModel
-    var viewController: UIViewController
+    weak var viewController: UIViewController?
     
-    init(model: AlertModel, viewController: UIViewController) {
+    init(model: AlertModel, viewController: UIViewController?) {
         self.viewController = viewController
         self.model = model
         }
     
-    deinit {
-        print(#function)
-    }
+    //deinit {
+    //    print(#function)
+    //}
     
     func showAlert() {
         let alert = UIAlertController(title: self.model.title,
                                       message: self.model.message,
                                       preferredStyle: .alert)
     
-        //guard let viewController = viewController else { return }
+        guard let viewController = viewController else { return }
         
         let action = UIAlertAction(title: self.model.buttonText, style: .default) {
             [weak self] _ in
             guard let self = self else { return }
-            //in
             self.model.completion()
         }
     
     alert.addAction(action)
     viewController.present(alert, animated: true)
-}
+    }
 }

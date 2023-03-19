@@ -25,6 +25,7 @@
 		BCB2867229A9038100DF75AE /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCB2867029A902F200DF75AE /* YS Display-Bold.ttf */; };
 		BCB2867329A9038500DF75AE /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCB2867129A902F200DF75AE /* YS Display-Medium.ttf */; };
 		BCB7688329C442C100E2D410 /* IMDBModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB7688229C442C100E2D410 /* IMDBModels.swift */; };
+		BCB7688529C63A9700E2D410 /* StatisticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB7688429C63A9700E2D410 /* StatisticService.swift */; };
 		BCD1CB7129BEF8E200849E5E /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD1CB7029BEF8E200849E5E /* AlertModel.swift */; };
 		BCD1CB7329BEF9B500849E5E /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD1CB7229BEF9B400849E5E /* AlertPresenter.swift */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 		BCB2867029A902F200DF75AE /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		BCB2867129A902F200DF75AE /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
 		BCB7688229C442C100E2D410 /* IMDBModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMDBModels.swift; sourceTree = "<group>"; };
+		BCB7688429C63A9700E2D410 /* StatisticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticService.swift; sourceTree = "<group>"; };
 		BCD1CB7029BEF8E200849E5E /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
 		BCD1CB7229BEF9B400849E5E /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -133,6 +135,7 @@
 				BC1CC48B29BAFDC5005A276D /* QuestionFactory.swift */,
 				BC60770C29BE3A3200D79BE0 /* QuestionFactoryProtocol.swift */,
 				BC60770E29BE421000D79BE0 /* QuestionFactoryDelegate.swift */,
+				BCB7688429C63A9700E2D410 /* StatisticService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -233,6 +236,7 @@
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				BC1CC48F29BB0248005A276D /* QuizStepViewModel.swift in Sources */,
 				BC1CC49329BB02B2005A276D /* QuizQuestion.swift in Sources */,
+				BCB7688529C63A9700E2D410 /* StatisticService.swift in Sources */,
 				BC1CC48C29BAFDC5005A276D /* QuestionFactory.swift in Sources */,
 				AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */,
 				AD1ABAB22831907B00B3E448 /* AppDelegate.swift in Sources */,

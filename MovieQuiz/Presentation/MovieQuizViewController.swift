@@ -19,6 +19,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var alertPresenter: AlertPresenter?
     
+    private var statisticService: StatisticService?
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -41,7 +43,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             questionFactory?.requestNextQuestion()
         }
-
+        
         let alertModel: AlertModel = AlertModel(quizRezult: result, completion: alertAction)
         alertPresenter = AlertPresenter(model: alertModel, viewController: self)
         
@@ -75,10 +77,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
+            
+            //мне показалось логичным собрать статистику в этой функции, а не в func show(quiz result: QuizResultsViewModel) как предлагается в учебнике
+            //возможно, будет правильнее изменить реализацию AlertModel и передать туда строку статистики в func show(quiz result: QuizResultsViewModel)func show(quiz result: QuizResultsViewModel) ?
+            
+            var statisticString = ""
+            
+            if let statisticService = statisticService {
+                
+                let bestRoundString: String = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))\n"
+                let totalString: String = "Количество сыгранных квизов: \(statisticService.gamesCount)\n"
+                let accuracyString: String = "Средняя точность \(String(format: "%.2f", statisticService.totalAccuracy))%"
+                
+            statisticString = totalString + bestRoundString + accuracyString
+                
+            }
+            
             let viewModel = QuizResultsViewModel(
-                title: "Этот раугд окончен!",
-                text: "Ваш результат \(correctAnswers) из \(questionsAmount)",
+                title: "Этот раунд окончен!",
+                text: "Ваш результат \(correctAnswers) из \(questionsAmount)\n" + statisticString,
                 buttonText: "Сыграть еще раз")
+            
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
@@ -88,73 +108,50 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    private func getMovie(from jsonString: String) -> Movie? {
+    // задания по сериализации JSON
+    /*
+     private func getMovie(from jsonString: String) -> Movie? {
         let jsonData = jsonString.data(using: .utf8)!
         
         do {
-            let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
-            
-            guard let json = json,
-                  let id = json["id"] as? String,
-                  let title = json["title"] as? String,
-                  let jsonYear = json["year"] as? String,
-                  let year = Int(jsonYear),
-                  let image = json["image"] as? String,
-                  let releaseDate = json["releaseDate"] as? String,
-                  let jsonRuntimeMins = json["runtimeMins"] as? String,
-                  let runtimeMins = Int(jsonRuntimeMins),
-                  let directors = json["directors"] as? String,
-                  let actorList = json["actorList"] as? [Any] else {
-                return nil
-            }
-            
-            var movieActors: [Actor] = []
-            
-            for actor in actorList {
-                guard let actor = actor as? [String: Any],
-                      let id = actor["id"] as? String,
-                      let image = actor["image"] as? String,
-                      let name = actor["name"] as? String,
-                      let asCharacter = actor["asCharacter"] as? String else {
-                    return nil
-                }
-                let movieActor = Actor(id: id, image: image, name: name, asCharacter: asCharacter)
-                movieActors.append(movieActor)
-            }
-            
-            let movie = Movie(id: id, title: title, year: year, image: image, releaseDate: releaseDate, runtimeMins: runtimeMins, directors: directors, actorList: movieActors)
+            let movie = try JSONDecoder().decode(Movie.self, from: jsonData)
             return movie
-            
         } catch {
             print("Failed to parse \(jsonString)")
             return nil
         }
     }
     
+    private func getTopMovies(from jsonString: String) -> TopMovieList? {
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            return nil
+        }
+        
+        do {
+            let topMovieList = try JSONDecoder().decode(TopMovieList.self, from: jsonData)
+            return topMovieList
+        } catch {
+            print("Failed to parse \(jsonString)")
+            return nil
+        }
+    }
+     */
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let jsonName: String = "inception.json"
+        // задания по сериализации JSON
+        /*
+        let jsonName: String = "top250MoviesIMDB.json"
         var jsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         jsonURL.appendPathComponent(jsonName)
         let jsonString = try? String(contentsOf: jsonURL)
         //print(getMovie(from: jsonString!))
-        //let jsonData = jsonString!.data(using: .utf8)!
+        //print(getTopMovies(from: jsonString!))
+        */
         
-        //поправить распаковку
-        
-       /* do {
-            let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
-            let actorList = json?["actorList"] as! [Any]
-            for actor in actorList {
-                if let actor = actor as? [String: Any] {
-                    print(actor["name"])
-                }
-            }
-        } catch {
-            print("Failed to parse \(jsonString!)")
-        }*/
+        statisticService = StatisticServiceImplementation()
     
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
