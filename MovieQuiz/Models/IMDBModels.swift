@@ -85,11 +85,14 @@ struct TopMovies: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.id = try container.decode(String.self, forKey: .id)
+        
         let rank = try container.decode(String.self, forKey: .rank)
         guard let rankValue = Int(rank) else {
             throw ParseError.rankFailure
         }
         self.rank = rankValue
+        
+        //self.rank = try container.decode(Int.self, forKey: .rank)
         
         self.title = try container.decode(String.self, forKey: .title)
         self.fullTitle = try container.decode(String.self, forKey: .fullTitle)

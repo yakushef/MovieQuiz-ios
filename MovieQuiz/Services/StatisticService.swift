@@ -26,6 +26,8 @@ protocol StatisticService {
 
 final class StatisticServiceImplementation: StatisticService {
     
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
     private let userDefaults = UserDefaults.standard
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
@@ -33,9 +35,9 @@ final class StatisticServiceImplementation: StatisticService {
     
     var totalAccuracy: Double {
         guard let correctData = userDefaults.data(forKey: Keys.correct.rawValue),
-              let correct = try? JSONDecoder().decode(Int.self, from: correctData),
+              let correct = try? decoder.decode(Int.self, from: correctData),
               let totalData = userDefaults.data(forKey: Keys.total.rawValue),
-              let total = try? JSONDecoder().decode(Int.self, from: totalData),
+              let total = try? decoder.decode(Int.self, from: totalData),
               total > 0 else {
             return 0.0
         }
@@ -45,14 +47,14 @@ final class StatisticServiceImplementation: StatisticService {
     var gamesCount: Int {
         get {
             guard let data = userDefaults.data(forKey: Keys.gamesCount.rawValue),
-                  let currentCount = try? JSONDecoder().decode(Int.self, from: data) else {
+                  let currentCount = try? decoder.decode(Int.self, from: data) else {
                 return 0
             }
             return currentCount
         }
         
         set {
-            guard let data = try? JSONEncoder().encode(newValue) else {
+            guard let data = try? encoder.encode(newValue) else {
                 print("Невозможно обновить число сыгранных раундов")
                 return
             }
@@ -63,14 +65,14 @@ final class StatisticServiceImplementation: StatisticService {
     var bestGame: GameRecord {
         get {
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
-                  let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
+                  let record = try? decoder.decode(GameRecord.self, from: data) else {
                 return .init(correct: 0, total: 0, date: Date())
             }
             return record
         }
         
         set {
-            guard let data = try? JSONEncoder().encode(newValue) else {
+            guard let data = try? encoder.encode(newValue) else {
                 print("Невозможно сохранить результат")
                 return
             }
@@ -81,14 +83,14 @@ final class StatisticServiceImplementation: StatisticService {
     private var correct: Int {
         get {
             guard let data = userDefaults.data(forKey: Keys.correct.rawValue),
-                  let currentCorrect = try? JSONDecoder().decode(Int.self, from: data) else {
+                  let currentCorrect = try? decoder.decode(Int.self, from: data) else {
                 return 0
             }
             return currentCorrect
         }
         
         set {
-            guard let data = try? JSONEncoder().encode(newValue) else {
+            guard let data = try? encoder.encode(newValue) else {
                 print("Невозможно обновить число правильных ответов")
                 return
             }
@@ -99,14 +101,14 @@ final class StatisticServiceImplementation: StatisticService {
     private var total: Int {
         get {
             guard let data = userDefaults.data(forKey: Keys.total.rawValue),
-                  let currentTotal = try? JSONDecoder().decode(Int.self, from: data) else {
+                  let currentTotal = try? decoder.decode(Int.self, from: data) else {
                 return 0
             }
             return currentTotal
         }
         
         set {
-            guard let data = try? JSONEncoder().encode(newValue) else {
+            guard let data = try? encoder.encode(newValue) else {
                 print("Невозможно обновить число заданных вопросов")
                 return
             }

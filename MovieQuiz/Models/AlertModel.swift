@@ -13,9 +13,9 @@ struct AlertModel {
     let buttonText: String
     let completion: () -> Void
     
-    init(quizRezult: QuizResultsViewModel, completion: @escaping () -> Void) {
+    init(quizRezult: QuizResultsViewModel, statisticString: String, completion: @escaping () -> Void) {
         self.title = quizRezult.title
-        self.message = quizRezult.text
+        self.message = quizRezult.text + statisticString
         self.buttonText = quizRezult.buttonText
         self.completion = completion
     }

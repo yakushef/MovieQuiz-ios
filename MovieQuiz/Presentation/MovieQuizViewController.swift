@@ -44,7 +44,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             questionFactory?.requestNextQuestion()
         }
         
-        let alertModel: AlertModel = AlertModel(quizRezult: result, completion: alertAction)
+        statisticService?.store(correct: correctAnswers, total: questionsAmount)
+        
+        var statisticString = ""
+        
+        if let statisticService = statisticService
+        {
+            
+            let bestRoundString: String = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))\n"
+            let totalString: String = "Количество сыгранных квизов: \(statisticService.gamesCount)\n"
+            let accuracyString: String = "Средняя точность \(String(format: "%.2f", statisticService.totalAccuracy))%"
+            
+            statisticString = totalString + bestRoundString + accuracyString
+        }
+        
+        let alertModel: AlertModel = AlertModel(quizRezult: result, statisticString: statisticString, completion: alertAction)
         alertPresenter = AlertPresenter(model: alertModel, viewController: self)
         
         alertPresenter?.showAlert()
@@ -76,27 +90,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 {
-            statisticService?.store(correct: correctAnswers, total: questionsAmount)
-            
-            //мне показалось логичным собрать статистику в этой функции, а не в func show(quiz result: QuizResultsViewModel) как предлагается в учебнике
-            //возможно, будет правильнее изменить реализацию AlertModel и передать туда строку статистики в func show(quiz result: QuizResultsViewModel)func show(quiz result: QuizResultsViewModel) ?
-            
-            var statisticString = ""
-            
-            if let statisticService = statisticService {
-                
-                let bestRoundString: String = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))\n"
-                let totalString: String = "Количество сыгранных квизов: \(statisticService.gamesCount)\n"
-                let accuracyString: String = "Средняя точность \(String(format: "%.2f", statisticService.totalAccuracy))%"
-                
-            statisticString = totalString + bestRoundString + accuracyString
-                
-            }
+        if currentQuestionIndex == questionsAmount - 1{
             
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат \(correctAnswers) из \(questionsAmount)\n" + statisticString,
+                text: "Ваш результат \(correctAnswers) из \(questionsAmount)\n",
                 buttonText: "Сыграть еще раз")
             
             show(quiz: viewModel)
@@ -148,7 +146,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         jsonURL.appendPathComponent(jsonName)
         let jsonString = try? String(contentsOf: jsonURL)
         //print(getMovie(from: jsonString!))
-        //print(getTopMovies(from: jsonString!))
+        print(getTopMovies(from: jsonString!))
         */
         
         statisticService = StatisticServiceImplementation()

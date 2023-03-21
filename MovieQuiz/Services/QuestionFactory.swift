@@ -54,16 +54,25 @@ class QuestionFactory: QuestionFactoryProtocol {
             correctAnswer: false)
     ]
     
+    private var questionsUnasked: [QuizQuestion] = []
+    
     init(delegate: QuestionFactoryDelegate) {
         self.delegate = delegate
     }
     
     func requestNextQuestion() {
-        guard let index = (0..<questions.count).randomElement() else {
+        
+        if questionsUnasked.count < 1 {
+            questionsUnasked = questions
+        }
+        
+        guard let index = (0..<questionsUnasked.count).randomElement() else {
             delegate?.didRecieveNextQuestion(question: nil)
             return
         }
-        let question = questions[safe: index]
+        
+        let question = questionsUnasked[safe: index]
+        questionsUnasked.remove(at: index)
         delegate?.didRecieveNextQuestion(question: question)
     }
 }
