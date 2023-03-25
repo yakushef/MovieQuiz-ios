@@ -10,25 +10,25 @@ import Foundation
 import UIKit
 
 class AlertPresenter {
-    let model: AlertModel
+    //let model: AlertModel
     weak var viewController: UIViewController?
     
-    init(model: AlertModel, viewController: UIViewController?) {
+    init(viewController: UIViewController?) {
         self.viewController = viewController
-        self.model = model
+        //self.model = model
     }
     
-    func showAlert() {
-        let alert = UIAlertController(title: self.model.title,
-                                      message: self.model.message,
+    func showAlert(model: AlertModel) {
+        let alert = UIAlertController(title: model.title,
+                                      message: model.message,
                                       preferredStyle: .alert)
     
         guard let viewController = viewController else { return }
         
-        let action = UIAlertAction(title: self.model.buttonText, style: .default) {
-            [weak self] _ in
-            guard let self = self else { return }
-            self.model.completion()
+        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
+            //[weak self] _ in
+            //guard let self = self else { return }
+            model.completion()
         }
     
     alert.addAction(action)

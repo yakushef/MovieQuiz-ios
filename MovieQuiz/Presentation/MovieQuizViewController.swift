@@ -9,6 +9,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     private var currentQuestionIndex: Int = 0
     
     private var correctAnswers: Int = 0
@@ -23,7 +25,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
     }
@@ -58,12 +60,50 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             statisticString = totalString + bestRoundString + accuracyString
         }
         
-        let alertModel: AlertModel = AlertModel(quizRezult: result, statisticString: statisticString, completion: alertAction)
-        alertPresenter = AlertPresenter(model: alertModel, viewController: self)
+        let alertModel = AlertModel(title: result.title, message: result.text + statisticString, buttonText: result.buttonText, completion: alertAction)
         
-        alertPresenter?.showAlert()
+        alertPresenter?.showAlert(model: alertModel)
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkAlert(message: error.localizedDescription)
+        //print(error.localizedDescription)
+    }
+    
+    // activity indicator
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    private func showNetworkAlert(message: String) {
+        //print("fail")
+        hideLoadingIndicator()
+        let networkAlertModel = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать еще раз") {
+            [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            //ЧТО ВЫЗЫВАТЬ..??
+            //self.questionFactory?.requestNextQuestion()
+            self.showLoadingIndicator()
+            self.questionFactory?.loadData()
+        }
+        alertPresenter?.showAlert(model: networkAlertModel)
+    }
     // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
     private func switchButtons() {
         yesButton.isEnabled.toggle()
@@ -148,11 +188,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         //print(getMovie(from: jsonString!))
         print(getTopMovies(from: jsonString!))
         */
+        alertPresenter = AlertPresenter(viewController: self)
         
         statisticService = StatisticServiceImplementation()
-    
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
+        //let movieLoader = MoviesLoader()
+        
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+        //questionFactory?.requestNextQuestion()
+        
+        showLoadingIndicator()
+        questionFactory?.loadData()
+
     }
     
     // MARK: - QuestionFactoryDelegate
