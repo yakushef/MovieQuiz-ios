@@ -60,7 +60,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             statisticString = totalString + bestRoundString + accuracyString
         }
         
-        let alertModel = AlertModel(title: result.title, message: result.text + statisticString, buttonText: result.buttonText, completion: alertAction)
+        let alertModel = AlertModel(title: result.title,
+                                    message: result.text + statisticString,
+                                    buttonText: result.buttonText,
+                                    completion: alertAction)
         
         alertPresenter?.showAlert(model: alertModel)
     }
@@ -72,7 +75,25 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     func didFailToLoadData(with error: Error) {
         showNetworkAlert(message: error.localizedDescription)
-        //print(error.localizedDescription)
+    }
+    
+    // image loading status
+    
+    private func showImageLoadingAlert() {
+        let imageLoadingAlertModel = AlertModel(title: "Ошибка",
+                                                message: "Не удалось загрузить постер",
+                                                buttonText: "Попробовать еще раз") {
+            self.questionFactory?.requestNextQuestion()
+        }
+        alertPresenter?.showAlert(model: imageLoadingAlertModel)
+    }
+    
+    func didFailToLoadImage() {
+        showImageLoadingAlert()
+    }
+    
+    func didLoadImageFromServer() {
+        switchButtons()
     }
     
     // activity indicator
@@ -88,17 +109,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNetworkAlert(message: String) {
-        //print("fail")
+
         hideLoadingIndicator()
-        let networkAlertModel = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать еще раз") {
+        let networkAlertModel = AlertModel(title: "Ошибка",
+                                           message: message,
+                                           buttonText: "Попробовать еще раз") {
             [weak self] in
             guard let self = self else { return }
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             
-            //ЧТО ВЫЗЫВАТЬ..??
-            //self.questionFactory?.requestNextQuestion()
             self.showLoadingIndicator()
             self.questionFactory?.loadData()
         }
@@ -125,7 +146,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             guard let self = self else { return }
             
             self.showNextQuestionOrResults()
-            self.switchButtons()
             }
     }
     
@@ -146,59 +166,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    // задания по сериализации JSON
-    /*
-     private func getMovie(from jsonString: String) -> Movie? {
-        let jsonData = jsonString.data(using: .utf8)!
-        
-        do {
-            let movie = try JSONDecoder().decode(Movie.self, from: jsonData)
-            return movie
-        } catch {
-            print("Failed to parse \(jsonString)")
-            return nil
-        }
-    }
-    
-    private func getTopMovies(from jsonString: String) -> TopMovieList? {
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            return nil
-        }
-        
-        do {
-            let topMovieList = try JSONDecoder().decode(TopMovieList.self, from: jsonData)
-            return topMovieList
-        } catch {
-            print("Failed to parse \(jsonString)")
-            return nil
-        }
-    }
-     */
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // задания по сериализации JSON
-        /*
-        let jsonName: String = "top250MoviesIMDB.json"
-        var jsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        jsonURL.appendPathComponent(jsonName)
-        let jsonString = try? String(contentsOf: jsonURL)
-        //print(getMovie(from: jsonString!))
-        print(getTopMovies(from: jsonString!))
-        */
+        switchButtons()
+        
         alertPresenter = AlertPresenter(viewController: self)
         
         statisticService = StatisticServiceImplementation()
-        //let movieLoader = MoviesLoader()
         
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
-        //questionFactory?.requestNextQuestion()
         
         showLoadingIndicator()
         questionFactory?.loadData()
-
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -208,6 +189,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         currentQuestion = question
         let viewModel = convert(model: question)
+        
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }

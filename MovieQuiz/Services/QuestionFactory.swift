@@ -64,18 +64,20 @@ class QuestionFactory: QuestionFactoryProtocol {
     }
     
     func loadData() {
-        moviesLoader.loadMovies { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                switch result {
-                case .success(let mostPopularMovies):
-                    self.movies = mostPopularMovies.items
-                    self.delegate?.didLoadDataFromServer()
-                case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error)
+        self.movies = []
+            moviesLoader.loadMovies() { [weak self] result in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let mostPopularMovies):
+                        self.movies = mostPopularMovies.items
+                        self.delegate?.didLoadDataFromServer()
+                    case .failure(let error):
+                        self.delegate?.didFailToLoadData(with: error)
+                        return
+                    }
                 }
             }
-        }
     }
     
     // добавить проверку на повторы
@@ -104,7 +106,15 @@ class QuestionFactory: QuestionFactoryProtocol {
             
             do {
                 imageData = try Data(contentsOf: movie.resizedImage)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.delegate?.didLoadImageFromServer()
+                }
             } catch {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.delegate?.didFailToLoadImage()
+                }
                 print("Failed to load image")
             }
             
