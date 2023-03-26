@@ -56,7 +56,7 @@ class QuestionFactory: QuestionFactoryProtocol {
 //            correctAnswer: false)
 //    ]
     
-    //private var questionsUnasked: [QuizQuestion] = []
+    private var movieQuestionsUnasked: [MostPopularMovie] = []
     
     init(delegate: QuestionFactoryDelegate, moviesLoader: MoviesLoading) {
         self.moviesLoader = moviesLoader
@@ -80,27 +80,17 @@ class QuestionFactory: QuestionFactoryProtocol {
             }
     }
     
-    // добавить проверку на повторы
     func requestNextQuestion() {
         
-//        if questionsUnasked.count < 1 {
-//            questionsUnasked = questions
-//        }
-//
-//        guard let index = (0..<questionsUnasked.count).randomElement() else {
-//            delegate?.didRecieveNextQuestion(question: nil)
-//            return
-//        }
-//
-//        let question = questionsUnasked[safe: index]
-//        questionsUnasked.remove(at: index)
-//        delegate?.didRecieveNextQuestion(question: question)
+        if movieQuestionsUnasked.count < 1 {
+            movieQuestionsUnasked = movies
+        }
         
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            let index = (0 ..< self.movies.count).randomElement() ?? 0
+            let index = (0 ..< self.movieQuestionsUnasked.count).randomElement() ?? 0
             
-            guard let movie = self.movies[safe: index] else { return }
+            guard let movie = self.movieQuestionsUnasked[safe: index] else { return }
             
             var imageData = Data()
             
@@ -124,6 +114,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             let correctAnswer = rating > 7
             
             let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
+            self.movieQuestionsUnasked.remove(at: index)
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
