@@ -69,7 +69,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
         questionFactory?.requestNextQuestion()
     }
     
@@ -93,6 +92,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didLoadImageFromServer() {
+        hideLoadingIndicator()
         switchButtons()
     }
     
@@ -145,6 +145,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             
+            self.showLoadingIndicator()
             self.showNextQuestionOrResults()
             }
     }
