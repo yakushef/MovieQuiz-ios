@@ -92,8 +92,6 @@ struct TopMovies: Codable {
         }
         self.rank = rankValue
         
-        //self.rank = try container.decode(Int.self, forKey: .rank)
-        
         self.title = try container.decode(String.self, forKey: .title)
         self.fullTitle = try container.decode(String.self, forKey: .fullTitle)
         

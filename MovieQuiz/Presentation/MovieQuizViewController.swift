@@ -9,6 +9,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     private var currentQuestionIndex: Int = 0
     
     private var correctAnswers: Int = 0
@@ -23,7 +25,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
     }
@@ -58,12 +60,71 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             statisticString = totalString + bestRoundString + accuracyString
         }
         
-        let alertModel: AlertModel = AlertModel(quizRezult: result, statisticString: statisticString, completion: alertAction)
-        alertPresenter = AlertPresenter(model: alertModel, viewController: self)
+        let alertModel = AlertModel(title: result.title,
+                                    message: result.text + statisticString,
+                                    buttonText: result.buttonText,
+                                    completion: alertAction)
         
-        alertPresenter?.showAlert()
+        alertPresenter?.showAlert(model: alertModel)
     }
     
+    func didLoadDataFromServer() {
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkAlert(message: error.localizedDescription)
+    }
+    
+    // image loading status
+    
+    private func showImageLoadingAlert() {
+        let imageLoadingAlertModel = AlertModel(title: "Ошибка",
+                                                message: "Не удалось загрузить постер",
+                                                buttonText: "Попробовать еще раз") {
+            self.questionFactory?.requestNextQuestion()
+        }
+        alertPresenter?.showAlert(model: imageLoadingAlertModel)
+    }
+    
+    func didFailToLoadImage() {
+        showImageLoadingAlert()
+    }
+    
+    func didLoadImageFromServer() {
+        hideLoadingIndicator()
+        switchButtons()
+    }
+    
+    // activity indicator
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    private func showNetworkAlert(message: String) {
+
+        hideLoadingIndicator()
+        let networkAlertModel = AlertModel(title: "Ошибка",
+                                           message: message,
+                                           buttonText: "Попробовать еще раз") {
+            [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            self.showLoadingIndicator()
+            self.questionFactory?.loadData()
+        }
+        alertPresenter?.showAlert(model: networkAlertModel)
+    }
     // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
     private func switchButtons() {
         yesButton.isEnabled.toggle()
@@ -84,8 +145,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             
+            self.showLoadingIndicator()
             self.showNextQuestionOrResults()
-            self.switchButtons()
             }
     }
     
@@ -106,53 +167,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    // задания по сериализации JSON
-    /*
-     private func getMovie(from jsonString: String) -> Movie? {
-        let jsonData = jsonString.data(using: .utf8)!
-        
-        do {
-            let movie = try JSONDecoder().decode(Movie.self, from: jsonData)
-            return movie
-        } catch {
-            print("Failed to parse \(jsonString)")
-            return nil
-        }
-    }
-    
-    private func getTopMovies(from jsonString: String) -> TopMovieList? {
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            return nil
-        }
-        
-        do {
-            let topMovieList = try JSONDecoder().decode(TopMovieList.self, from: jsonData)
-            return topMovieList
-        } catch {
-            print("Failed to parse \(jsonString)")
-            return nil
-        }
-    }
-     */
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // задания по сериализации JSON
-        /*
-        let jsonName: String = "top250MoviesIMDB.json"
-        var jsonURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        jsonURL.appendPathComponent(jsonName)
-        let jsonString = try? String(contentsOf: jsonURL)
-        //print(getMovie(from: jsonString!))
-        print(getTopMovies(from: jsonString!))
-        */
+        switchButtons()
+        
+        alertPresenter = AlertPresenter(viewController: self)
         
         statisticService = StatisticServiceImplementation()
-    
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
+        
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+        
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -162,6 +190,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         currentQuestion = question
         let viewModel = convert(model: question)
+        
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
