@@ -10,12 +10,12 @@ import Foundation
 import UIKit
 
 class AlertPresenter {
-    //let model: AlertModel
+
     weak var viewController: UIViewController?
     
     init(viewController: UIViewController?) {
         self.viewController = viewController
-        //self.model = model
+
     }
     
     func showAlert(model: AlertModel) {
@@ -24,6 +24,8 @@ class AlertPresenter {
                                       preferredStyle: .alert)
     
         guard let viewController = viewController else { return }
+        
+        alert.view.accessibilityIdentifier = "Game Results"
         
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
             //[weak self] _ in
