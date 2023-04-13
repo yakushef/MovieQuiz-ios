@@ -15,11 +15,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var correctAnswers: Int = 0
     private var currentQuestion: QuizQuestion?
     
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     private var questionFactory: QuestionFactory?
     private var statisticService: StatisticService!
     
-    init(viewController: MovieQuizViewController?) {
+    init(viewController: MovieQuizViewControllerProtocol?) {
         self.viewController = viewController
         
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
@@ -27,6 +27,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         startLoadingData()
     }
+    
+    // MARK: Base Methods
     
     func startLoadingData() {
         questionFactory?.loadData()
@@ -36,6 +38,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func resetGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
+        viewController?.showLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
     
@@ -94,10 +97,12 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         } else {
             switchToNextQuestion()
             viewController?.clearImageBorder()
-
+            viewController?.showLoadingIndicator()
             self.questionFactory?.requestNextQuestion()
         }
     }
+    
+    // MARK: - Alert resources
     
     func makeStatisticsString() -> String {
         statisticService.store(correct: correctAnswers, total: questionsAmount)
@@ -110,6 +115,12 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         return statisticString
     }
+    
+    func tryToLoadImage() {
+        questionFactory?.requestNextQuestion()
+    }
+    
+    // MARK: Answer Handling
     
     private func proceedWithAnswer(isCorrect: Bool) {
         didAnswer(isCorrect: isCorrect)
@@ -127,10 +138,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         if isCorrect {
             correctAnswers += 1
         }
-    }
-    
-    func tryToLoadImage() {
-        questionFactory?.requestNextQuestion()
     }
     
     // MARK: Yes & No buttons

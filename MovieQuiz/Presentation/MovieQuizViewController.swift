@@ -1,6 +1,21 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func show(quiz step: QuizStepViewModel)
+    func show(quiz result: QuizResultsViewModel)
+    
+    func highthightImageBorder(isCorrect: Bool)
+    func clearImageBorder()
+    
+    func readyForNextQuestion()
+    
+    func showLoadingIndicator()
+    
+    func showImageLoadingAlert()
+    func showNetworkAlert(message: String)
+}
+
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -13,6 +28,8 @@ final class MovieQuizViewController: UIViewController {
     
     private var presenter: MovieQuizPresenter!
     private var alertPresenter: AlertPresenter!
+    
+    // MARK: Show
     
     func show(quiz step: QuizStepViewModel) {
         clearImageBorder()
@@ -35,16 +52,7 @@ final class MovieQuizViewController: UIViewController {
         alertPresenter?.showAlert(model: alertModel)
     }
     
-    // image loading status
-    
-    func showImageLoadingAlert() {
-        let imageLoadingAlertModel = AlertModel(title: "Ошибка",
-                                                message: "Не удалось загрузить постер",
-                                                buttonText: "Попробовать еще раз") {
-            self.presenter.tryToLoadImage()
-        }
-        alertPresenter.showAlert(model: imageLoadingAlertModel)
-    }
+    // MARK: Status Indications
     
     func readyForNextQuestion() {
         hideLoadingIndicator()
@@ -63,6 +71,29 @@ final class MovieQuizViewController: UIViewController {
         activityIndicator.stopAnimating()
     }
     
+    func highthightImageBorder(isCorrect: Bool) {
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        
+        switchButtons()
+    }
+    
+    func clearImageBorder() {
+        imageView.layer.borderWidth = 0
+    }
+    
+    // MARK: Alerts
+    
+    func showImageLoadingAlert() {
+        let imageLoadingAlertModel = AlertModel(title: "Ошибка",
+                                                message: "Не удалось загрузить постер",
+                                                buttonText: "Попробовать еще раз") {
+            self.presenter.tryToLoadImage()
+        }
+        alertPresenter.showAlert(model: imageLoadingAlertModel)
+    }
+    
     func showNetworkAlert(message: String) {
 
         hideLoadingIndicator()
@@ -76,23 +107,6 @@ final class MovieQuizViewController: UIViewController {
             self.presenter.startLoadingData()
         }
         alertPresenter?.showAlert(model: networkAlertModel)
-    }
-    // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
-    private func switchButtons() {
-        yesButton.isEnabled.toggle()
-        noButton.isEnabled.toggle()
-    }
-    
-    func highthightImageBorder(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        switchButtons()
-    }
-    
-    func clearImageBorder() {
-        imageView.layer.borderWidth = 0
     }
     
     // MARK: - Lifecycle
@@ -110,13 +124,13 @@ final class MovieQuizViewController: UIViewController {
         return .lightContent
     }
     
-    // MARK: - QuestionFactoryDelegate
-    
-    func didRecieveNextQuestion(question: QuizQuestion?) {
-        presenter.didRecieveNextQuestion(question: question)
-    }
-    
     // MARK: YES & NO Buttons
+    
+    // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны
+    private func switchButtons() {
+        yesButton.isEnabled.toggle()
+        noButton.isEnabled.toggle()
+    }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         presenter.yesButtonTapped()
