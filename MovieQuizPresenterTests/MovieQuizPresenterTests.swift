@@ -17,7 +17,7 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
         
     }
     
-    func highthightImageBorder(isCorrect: Bool) {
+    func highlightImageBorder(isCorrect: Bool) {
         
     }
     

@@ -4,7 +4,7 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func show(quiz step: QuizStepViewModel)
     func show(quiz result: QuizResultsViewModel)
     
-    func highthightImageBorder(isCorrect: Bool)
+    func highlightImageBorder(isCorrect: Bool)
     func clearImageBorder()
     
     func readyForNextQuestion()
@@ -71,7 +71,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         activityIndicator.stopAnimating()
     }
     
-    func highthightImageBorder(isCorrect: Bool) {
+    func highlightImageBorder(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor

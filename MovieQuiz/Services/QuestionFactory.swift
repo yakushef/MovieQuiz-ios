@@ -108,10 +108,12 @@ class QuestionFactory: QuestionFactoryProtocol {
                 print("Failed to load image")
             }
             
+            let questionRating = Int.random(in: 7...9)
+            let questionIsMore: Bool = Bool.random()
             let rating = Float(movie.rating) ?? 0
             
-            let text = "Рейтинг этого фильма больше, чем 7?"
-            let correctAnswer = rating > 7
+            let text = questionIsMore ? "Рейтинг этого фильма больше, чем \(questionRating)?" : "Рейтинг этого фильма меньше, чем \(questionRating)?"
+            let correctAnswer = questionIsMore ? rating > Float(questionRating) : rating < Float(questionRating)
             
             let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
             self.movieQuestionsUnasked.remove(at: index)
