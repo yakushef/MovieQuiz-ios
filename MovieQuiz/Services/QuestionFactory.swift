@@ -7,54 +7,11 @@
 
 import Foundation
 
-class QuestionFactory: QuestionFactoryProtocol {
+final class QuestionFactory: QuestionFactoryProtocol {
     private let moviesLoader: MoviesLoading
     weak var delegate: QuestionFactoryDelegate?
     
     private var movies: [MostPopularMovie] = []
-    
-//    private let questions: [QuizQuestion] = [
-//        QuizQuestion(
-//            image: "The Godfather",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Dark Knight",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "Kill Bill",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Avengers",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "Deadpool",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Green Knight",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "Old",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "The Ice Age Adventures of Buck Wild",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "Tesla",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "Vivarium",
-//            text: "Рейтинг этого фильма больше чем 6?",
-//            correctAnswer: false)
-//    ]
     
     private var movieQuestionsUnasked: [MostPopularMovie] = []
     
@@ -105,13 +62,16 @@ class QuestionFactory: QuestionFactoryProtocol {
                     guard let self = self else { return }
                     self.delegate?.didFailToLoadImage()
                 }
-                print("Failed to load image")
+                //assertionFaiure("Failed to load image")
+                // предложенный assertionFaiure если я верно понял всегда крашит приложение и предназначен для дебага. Т.к. здесь я в методе didFailToLoadImage() делегата вызывю алерт с предложением повторить загрузку, то полагаю после отработки алерта необходимости в печати в консоль также нет
             }
             
+            let questionRating = Int.random(in: 7...9)
+            let questionIsMore: Bool = Bool.random()
             let rating = Float(movie.rating) ?? 0
             
-            let text = "Рейтинг этого фильма больше, чем 7?"
-            let correctAnswer = rating > 7
+            let text = questionIsMore ? "Рейтинг этого фильма больше, чем \(questionRating)?" : "Рейтинг этого фильма меньше, чем \(questionRating)?"
+            let correctAnswer = questionIsMore ? rating > Float(questionRating) : rating < Float(questionRating)
             
             let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
             self.movieQuestionsUnasked.remove(at: index)
@@ -124,67 +84,3 @@ class QuestionFactory: QuestionFactoryProtocol {
         
     }
 }
-
-/*
- Mock-данные
- 
- 
- Картинка: The Godfather
- Настоящий рейтинг: 9,2
- Вопрос: The Dark Knight
- Ответ: ДА
-
-
- Картинка: The Dark Knight
- Настоящий рейтинг: 9
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Kill Bill
- Настоящий рейтинг: 8,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Avengers
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Deadpool
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Green Knight
- Настоящий рейтинг: 6,6
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Old
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: The Ice Age Adventures of Buck Wild
- Настоящий рейтинг: 4,3
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Tesla
- Настоящий рейтинг: 5,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Vivarium
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- */

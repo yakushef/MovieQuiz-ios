@@ -5,17 +5,15 @@
 //  Created by Aleksey Yakushev on 13.03.2023.
 //
 
-import Foundation
-
 import UIKit
 
-class AlertPresenter {
-    //let model: AlertModel
+final class AlertPresenter {
+
     weak var viewController: UIViewController?
     
     init(viewController: UIViewController?) {
         self.viewController = viewController
-        //self.model = model
+
     }
     
     func showAlert(model: AlertModel) {
@@ -25,9 +23,9 @@ class AlertPresenter {
     
         guard let viewController = viewController else { return }
         
+        alert.view.accessibilityIdentifier = "Game Results"
+        
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
-            //[weak self] _ in
-            //guard let self = self else { return }
             model.completion()
         }
     
