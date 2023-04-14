@@ -7,7 +7,7 @@
 
 import Foundation
 
-class QuestionFactory: QuestionFactoryProtocol {
+final class QuestionFactory: QuestionFactoryProtocol {
     private let moviesLoader: MoviesLoading
     weak var delegate: QuestionFactoryDelegate?
     
@@ -62,7 +62,8 @@ class QuestionFactory: QuestionFactoryProtocol {
                     guard let self = self else { return }
                     self.delegate?.didFailToLoadImage()
                 }
-                print("Failed to load image")
+                //assertionFaiure("Failed to load image")
+                // предложенный assertionFaiure если я верно понял всегда крашит приложение и предназначен для дебага. Т.к. здесь я в методе didFailToLoadImage() делегата вызывю алерт с предложением повторить загрузку, то полагаю после отработки алерта необходимости в печати в консоль также нет
             }
             
             let questionRating = Int.random(in: 7...9)

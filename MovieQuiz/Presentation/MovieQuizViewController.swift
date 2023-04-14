@@ -29,6 +29,23 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     private var presenter: MovieQuizPresenter!
     private var alertPresenter: AlertPresenter!
     
+    private let generator = UINotificationFeedbackGenerator()
+    
+    // MARK: Status bar color
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        switchButtons()
+        
+        alertPresenter = AlertPresenter(viewController: self)
+        presenter = MovieQuizPresenter(viewController: self)
+    }
+    
     // MARK: Show
     
     func show(quiz step: QuizStepViewModel) {
@@ -55,23 +72,19 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     // MARK: Status Indications
     
     func readyForNextQuestion() {
-        hideLoadingIndicator()
+        activityIndicator.stopAnimating()
         switchButtons()
     }
     
     // activity indicator
     
     func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     
-    private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
-        activityIndicator.stopAnimating()
-    }
-    
     func highlightImageBorder(isCorrect: Bool) {
+        isCorrect ? generator.notificationOccurred(.success) : generator.notificationOccurred(.error)
+
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -96,8 +109,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     }
     
     func showNetworkAlert(message: String) {
-
-        hideLoadingIndicator()
+        activityIndicator.stopAnimating()
+        
         let networkAlertModel = AlertModel(title: "Ошибка",
                                            message: message,
                                            buttonText: "Попробовать еще раз") {
@@ -109,22 +122,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         }
         alertPresenter.showAlert(model: networkAlertModel)
     }
-    
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        switchButtons()
-        
-        alertPresenter = AlertPresenter(viewController: self)
-        presenter = MovieQuizPresenter(viewController: self)
-    }
-    
-    // MARK: Status bar color
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
+
     // MARK: YES & NO Buttons
     
     // нажатие на кнопки "да" и "нет" во время паузы в 1 секунду между вопросами приводило к некорректной работе, на кремя паузы кноаки неактивны

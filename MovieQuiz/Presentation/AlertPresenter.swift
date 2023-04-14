@@ -5,11 +5,9 @@
 //  Created by Aleksey Yakushev on 13.03.2023.
 //
 
-import Foundation
-
 import UIKit
 
-class AlertPresenter {
+final class AlertPresenter {
 
     weak var viewController: UIViewController?
     
@@ -28,8 +26,6 @@ class AlertPresenter {
         alert.view.accessibilityIdentifier = "Game Results"
         
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
-            //[weak self] _ in
-            //guard let self = self else { return }
             model.completion()
         }
     

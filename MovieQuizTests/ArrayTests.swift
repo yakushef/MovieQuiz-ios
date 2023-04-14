@@ -14,17 +14,17 @@ class arrayTests: XCTestCase {
     
     func testGetValueInRange() throws {
         //Given
-        let array = [1, 1, 2, 3, 5]
+        let array = [0, 7, 15, 2, 3]
         //When
-        let value = array[safe: 2]
+        let value = array[safe: 1]
         //Then
         XCTAssertNotNil(value)
-        XCTAssertEqual(value, 2)
+        XCTAssertEqual(value, 7)
     }
     
     func testGetValueOutOfRange() throws {
         //Given
-        let array = [1, 1, 2, 3, 5]
+        let array = [10, 23, 7, 1, 2]
         //When
         let value = array[safe: 9]
         //Then
