@@ -88,7 +88,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func showImageLoadingAlert() {
         let imageLoadingAlertModel = AlertModel(title: "Ошибка",
                                                 message: "Не удалось загрузить постер",
-                                                buttonText: "Попробовать еще раз") {
+                                                buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self else { return }
             self.presenter.tryToLoadImage()
         }
         alertPresenter.showAlert(model: imageLoadingAlertModel)
@@ -106,7 +107,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             self.presenter.resetGame()
             self.presenter.startLoadingData()
         }
-        alertPresenter?.showAlert(model: networkAlertModel)
+        alertPresenter.showAlert(model: networkAlertModel)
     }
     
     // MARK: - Lifecycle
